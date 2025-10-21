@@ -1,4 +1,4 @@
-//get items using the the defined id in html file
+/*//get items using the the defined id in html file
 const bgm = document.getElementById('backgroundmusic');
 const button = document.getElementById('switch-button');
 const gameThumbnails = document.getElementById('game-thumb');
@@ -36,6 +36,56 @@ button.addEventListener('click', () => {
 
     //randomly get a random thumbnailsfrom the store local array gamesData
     const random = gamesData[Math.floor(Math.random() * gamesData.length)];
+    gameThumbnails.src = random.thumbnail;
+    gameThumbnails.alt = random.title || 'Random Game Thumbnail';
+});*/
+
+// Get items using the defined IDs in the HTML file
+const bgm = document.getElementById('backgroundmusic');
+const button = document.getElementById('switch-button');
+const gameThumbnails = document.getElementById('game-thumb');
+
+let gamesData = []; // store fetched data
+
+// Fetch game data once when the page loads
+async function fetchGames() {
+    const proxyUrl = 'https://api.allorigins.win/raw?url=';
+    const apiUrl = 'https://www.freetogame.com/api/games';
+    const finalUrl = proxyUrl + encodeURIComponent(apiUrl);
+
+    try {
+        const res = await fetch(finalUrl);
+
+        // Output messages to rule out network issues
+        if (!res.ok) throw new Error(`Network response not ok: ${res.status}`);
+
+        // Store all fetched game data in local array
+        gamesData = await res.json();
+
+        console.log(`Fetched ${gamesData.length} games successfully!`);
+    } catch (err) {
+        console.error('Failed to fetch game data:', err);
+    }
+}
+
+fetchGames();
+
+// Pick random game on button click
+button.addEventListener('click', () => {
+    if (gamesData.length === 0) {
+        console.error('Game data not loaded yet!');
+        return;
+    }
+
+    // Play background music if not already playing
+    if (bgm.paused) {
+        bgm.play().catch(err => console.log('Autoplay blocked:', err));
+    }
+
+    // Randomly select a game from the stored data
+    const random = gamesData[Math.floor(Math.random() * gamesData.length)];
+
+    // Update thumbnail and alt text
     gameThumbnails.src = random.thumbnail;
     gameThumbnails.alt = random.title || 'Random Game Thumbnail';
 });
